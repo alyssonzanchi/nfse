@@ -32,7 +32,7 @@ export function Auth({ children }: AuthProps) {
 
   const validateToken = async (token: string) => {
     try {
-      const response = await fetch('http://localhost:3333/check-token', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/check-token`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${token}`
