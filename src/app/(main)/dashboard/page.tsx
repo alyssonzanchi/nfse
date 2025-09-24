@@ -14,16 +14,32 @@ export type ImovelComTomador = {
   };
 };
 
-type DashboardPageProps = {
-  searchParams?: { [key: string]: string | string[] | undefined };
-};
-
 export default async function DashboardPage({
   searchParams,
-}: DashboardPageProps) {
-  const page = Number(searchParams?.page ?? 1);
+}: {
+  searchParams: Promise<{
+    page?: string | string[] | undefined;
+    search?: string | string[] | undefined;
+  }>;
+}) {
+  const resolved = await searchParams;
+  const rawPage = resolved.page;
+  const rawSearch = resolved.search;
+
+  const page =
+    typeof rawPage === "string"
+      ? Number(rawPage)
+      : Array.isArray(rawPage)
+      ? Number(rawPage[0])
+      : 1;
+
   const search =
-    typeof searchParams?.search === "string" ? searchParams.search : "";
+    typeof rawSearch === "string"
+      ? rawSearch
+      : Array.isArray(rawSearch)
+      ? rawSearch[0]
+      : "";
+      
   const limit = 10;
 
   const whereClause: Prisma.ImovelWhereInput = {};
