@@ -24,10 +24,8 @@ type DashboardPageProps = {
 export default async function DashboardPage({
   searchParams,
 }: DashboardPageProps) {
-  const page =
-    typeof searchParams.page === "string" ? Number(searchParams.page) : 1;
-  const search =
-    typeof searchParams.search === "string" ? searchParams.search : "";
+  const page = Number(searchParams.page ?? 1);
+  const search = searchParams.search ?? "";
   const limit = 10;
 
   const whereClause: Prisma.ImovelWhereInput = {};
