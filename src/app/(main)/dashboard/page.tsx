@@ -15,17 +15,15 @@ export type ImovelComTomador = {
 };
 
 type DashboardPageProps = {
-  searchParams: {
-    page?: string;
-    search?: string;
-  };
+  searchParams?: { [key: string]: string | string[] | undefined };
 };
 
 export default async function DashboardPage({
   searchParams,
 }: DashboardPageProps) {
-  const page = Number(searchParams.page ?? 1);
-  const search = searchParams.search ?? "";
+  const page = Number(searchParams?.page ?? 1);
+  const search =
+    typeof searchParams?.search === "string" ? searchParams.search : "";
   const limit = 10;
 
   const whereClause: Prisma.ImovelWhereInput = {};
