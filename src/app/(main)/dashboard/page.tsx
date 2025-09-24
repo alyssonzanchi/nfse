@@ -14,11 +14,16 @@ export type ImovelComTomador = {
   };
 };
 
+type DashboardPageProps = {
+  searchParams: {
+    page?: string;
+    search?: string;
+  };
+};
+
 export default async function DashboardPage({
   searchParams,
-}: {
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
+}: DashboardPageProps) {
   const page =
     typeof searchParams.page === "string" ? Number(searchParams.page) : 1;
   const search =

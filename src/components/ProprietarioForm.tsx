@@ -2,7 +2,8 @@
 
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
-import { createProprietario, State } from "@/app/(main)/proprietarios/actions";
+import { createProprietario } from "@/app/(main)/proprietarios/actions";
+import { type ActionState } from "@/lib/definitions";
 import {
   Card,
   CardContent,
@@ -32,7 +33,7 @@ function SubmitButton() {
 }
 
 export default function ProprietarioForm() {
-  const initialState: State = { message: null, errors: {} };
+  const initialState: ActionState = { message: null, errors: {} };
   const [state, dispatch] = useActionState(createProprietario, initialState);
 
   return (

@@ -4,6 +4,7 @@ import { z } from "zod";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { type ActionState } from "@/lib/definitions";
 
 const proprietarioSchema = z.object({
   nome_razao_social: z.string().min(3, "O nome é obrigatório."),
@@ -17,14 +18,10 @@ const proprietarioSchema = z.object({
   email: z.string().email("Email inválido.").optional().or(z.literal("")),
 });
 
-export type State = {
-  errors?: {
-    [key: string]: string[];
-  };
-  message?: string | null;
-};
-
-export async function createProprietario(prevState: State, formData: FormData) {
+export async function createProprietario(
+  prevState: ActionState,
+  formData: FormData
+) {
   const validatedFields = proprietarioSchema.safeParse(
     Object.fromEntries(formData.entries())
   );

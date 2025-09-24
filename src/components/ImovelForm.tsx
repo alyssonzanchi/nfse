@@ -2,7 +2,8 @@
 
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
-import { createImovel, State } from "@/app/(main)/imoveis/actions";
+import { createImovel } from "@/app/(main)/imoveis/actions";
+import { type ActionState } from "@/lib/definitions";
 import { Tomador } from "@prisma/client";
 import {
   Card,
@@ -37,7 +38,7 @@ interface ImovelFormProps {
 }
 
 export default function ImovelForm({ proprietarios }: ImovelFormProps) {
-  const initialState: State = { message: null, errors: {} };
+  const initialState: ActionState = { message: null, errors: {} };
   const [state, dispatch] = useActionState(createImovel, initialState);
 
   return (

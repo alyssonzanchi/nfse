@@ -4,7 +4,7 @@ import { z } from "zod";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { type State } from "../proprietarios/actions";
+import { type ActionState } from "@/lib/definitions";
 
 const imovelSchema = z.object({
   endereco: z.string().min(5, "O endereço é obrigatório."),
@@ -12,7 +12,7 @@ const imovelSchema = z.object({
   tomadorId: z.coerce.number().min(1, "Selecione um proprietário."),
 });
 
-export async function createImovel(prevState: State, formData: FormData) {
+export async function createImovel(prevState: ActionState, formData: FormData) {
   const validatedFields = imovelSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
