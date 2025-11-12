@@ -120,7 +120,7 @@ export async function gerarNotaFiscalAction(imovelId: number, valor: string) {
       "base64"
     )}`;
 
-    const apiUrl = `https://ws-${cidadeNomeUrl}.atende.net:7443/?pg=rest&service=WNERestServiceNFSe`;
+    const apiUrl = `https://${cidadeNomeUrl}.atende.net:7443/?pg=rest&service=WNERestServiceNFSe`;
 
     const response = await axios.post(apiUrl, formData, {
       headers: { ...formData.getHeaders(), Authorization: authHeader },
