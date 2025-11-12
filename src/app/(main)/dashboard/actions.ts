@@ -39,8 +39,14 @@ export async function gerarNotaFiscalAction(imovelId: number, valor: string) {
     }
     const { tomador } = imovel;
 
+    const cidadeNomeUrl = process.env.CIDADE_PRESTADOR_NOME;
+    const cidadeCodigoTom = process.env.CIDADE_PRESTADOR;
+    const login = process.env.LOGIN;
+    const senha = process.env.SENHA;
+
     const data = `<?xml version="1.0" encoding="ISO-8859-1"?>
 <nfse>
+<nfse_teste>${process.env.NFSE_TESTE}</nfse_teste>
 <nf>
     <valor_total>${valor}</valor_total>
     <valor_desconto>0,00</valor_desconto>
@@ -53,8 +59,8 @@ export async function gerarNotaFiscalAction(imovelId: number, valor: string) {
     <observacao>IMOVEL: ${imovel.endereco}</observacao>
 </nf>
 <prestador>
-    <cpfcnpj>${process.env.LOGIN}</cpfcnpj>
-    <cidade>${process.env.CIDADE_PRESTADOR}</cidade>
+    <cpfcnpj>${login}</cpfcnpj>
+    <cidade>${cidadeCodigoTom}</cidade>
 </prestador>
 <tomador>
     <tipo>${tomador.type}</tipo>
@@ -90,7 +96,7 @@ export async function gerarNotaFiscalAction(imovelId: number, valor: string) {
     <aliquota_item_lista_servico>${
       process.env.ALIQUOTA
     }</aliquota_item_lista_servico>
-    <situacao_tributaria>00</situacao_tributaria>
+    <situacao_tributaria>0</situacao_tributaria>
     <valor_tributavel>${valor}</valor_tributavel>
     <valor_deducao>0,00</valor_deducao>
     <valor_issrf>0,00</valor_issrf>
@@ -106,29 +112,31 @@ export async function gerarNotaFiscalAction(imovelId: number, valor: string) {
 `;
 
     const formData = new FormData();
-    formData.append("login", process.env.LOGIN);
-    formData.append("senha", process.env.SENHA);
 
     const xmlBuffer = Buffer.from(data, "latin1");
     formData.append("f1", xmlBuffer, { filename: `imovel_${imovelId}.xml` });
 
-    const response = await axios.post(
-      "http://sync.nfs-e.net/datacenter/include/nfw/importa_nfw/nfw_import_upload.php",
-      formData,
-      { headers: formData.getHeaders() }
-    );
+    const authHeader = `Basic ${Buffer.from(`${login}:${senha}`).toString(
+      "base64"
+    )}`;
+
+    const apiUrl = `https://ws-${cidadeNomeUrl}.atende.net:7443/?pg=rest&service=WNERestServiceNFSe`;
+
+    const response = await axios.post(apiUrl, formData, {
+      headers: { ...formData.getHeaders(), Authorization: authHeader },
+    });
 
     const responseDataString = String(response.data);
 
-    if (responseDataString.includes("<title>Nota Fiscal de Servi")) {
+    if (responseDataString.includes("00001 - Sucesso")) {
       return {
         success: true,
         message: "Nota Fiscal gerada e enviada com sucesso!",
       };
     } else {
-      const errorMatch = responseDataString.match(/<li[^>]*>([^<]+)<\/li>/);
+      const errorMatch = responseDataString.match(/<codigo>([^<]+)<\/codigo>/);
       const cleanErrorMessage = errorMatch
-        ? errorMatch[1]
+        ? errorMatch[1].replace(/\[\d+\]\s*-\s*/, "")
         : "A API externa retornou um erro desconhecido.";
 
       return {
@@ -136,8 +144,12 @@ export async function gerarNotaFiscalAction(imovelId: number, valor: string) {
         message: cleanErrorMessage,
       };
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error("Erro ao gerar nota fiscal:", error);
+    if (error.response) {
+      console.error("Data:", error.response.data);
+      console.error("Status:", error.response.status);
+    }
     return { success: false, message: "Ocorreu um erro interno no servidor." };
   }
 }
