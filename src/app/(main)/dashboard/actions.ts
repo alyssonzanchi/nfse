@@ -144,9 +144,9 @@ export async function gerarNotaFiscalAction(imovelId: number, valor: string) {
         message: cleanErrorMessage,
       };
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Erro ao gerar nota fiscal:", error);
-    if (error.response) {
+    if (axios.isAxiosError(error) && error.response) {
       console.error("Data:", error.response.data);
       console.error("Status:", error.response.status);
     }
