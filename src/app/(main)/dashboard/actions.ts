@@ -46,7 +46,6 @@ export async function gerarNotaFiscalAction(imovelId: number, valor: string) {
 
     const data = `<?xml version="1.0" encoding="ISO-8859-1"?>
 <nfse>
-<nfse_teste>${process.env.NFSE_TESTE}</nfse_teste>
 <nf>
     <valor_total>${valor}</valor_total>
     <valor_desconto>0,00</valor_desconto>
@@ -65,30 +64,22 @@ export async function gerarNotaFiscalAction(imovelId: number, valor: string) {
 <tomador>
     <tipo>${tomador.type}</tipo>
     <cpfcnpj>${tomador.cpf_cnpj}</cpfcnpj>
-    <ie></ie>
     <nome_razao_social>${escapeXml(
       tomador.nome_razao_social
     )}</nome_razao_social>
-    <sobrenome_nome_fantasia></sobrenome_nome_fantasia>
     <logradouro>${tomador.logradouro}</logradouro>
     <email>${tomador.email ?? ""}</email>
     <complemento>${tomador.complemento ?? ""}</complemento>
-    <ponto_referencia></ponto_referencia>
     <bairro>${tomador.bairro}</bairro>
     <cidade>${tomador.cod_cidade}</cidade>
     <cep>${tomador.cep}</cep>
-    <ddd_fone_comercial></ddd_fone_comercial>
-    <fone_comercial></fone_comercial>
-    <ddd_fone_residencial></ddd_fone_residencial>
-    <fone_residencial></fone_residencial>
-    <ddd_fax></ddd_fax>
-    <fone_fax></fone_fax>
 </tomador>
 <itens>
     <lista>
     <codigo_local_prestacao_servico>${
       imovel.cod_loc
     }</codigo_local_prestacao_servico>
+    <codigo_atividade>${process.env.COD_ATIVIDADE}</codigo_atividade>
     <codigo_item_lista_servico>${
       process.env.COD_SERVICO
     }</codigo_item_lista_servico>
@@ -120,7 +111,7 @@ export async function gerarNotaFiscalAction(imovelId: number, valor: string) {
       "base64"
     )}`;
 
-    const apiUrl = `https://ws-${cidadeNomeUrl}.atende.net:7443/?pg=rest&service=WNERestServiceNFSe`;
+    const apiUrl = `https://${cidadeNomeUrl}.atende.net/atende.php?pg=rest&service=WNERestServiceNFSe&cidade=padrao`;
 
     const response = await axios.post(apiUrl, formData, {
       headers: { ...formData.getHeaders(), Authorization: authHeader },
