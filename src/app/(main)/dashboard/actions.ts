@@ -13,6 +13,13 @@ function escapeXml(unsafe: string | null | undefined): string {
   return unsafe.replace(/&/g, "&amp;");
 }
 
+function limparCpfCnpj(cpfCnpj: string | null | undefined): string {
+  if (!cpfCnpj) {
+    return "";
+  }
+  return cpfCnpj.replace(/\D/g, "");
+}
+
 export async function gerarNotaFiscalAction(imovelId: number, valor: string) {
   const session = await getServerSession(authOptions);
   if (!session) {
@@ -44,6 +51,15 @@ export async function gerarNotaFiscalAction(imovelId: number, valor: string) {
     const login = process.env.LOGIN;
     const senha = process.env.SENHA;
 
+    if (!cidadeNomeUrl || !cidadeCodigoTom || !login || !senha) {
+      return {
+        success: false,
+        message: "Variáveis de ambiente da prefeitura não configuradas.",
+      };
+    }
+
+    const loginLimpo = limparCpfCnpj(login);
+
     const data = `<?xml version="1.0" encoding="ISO-8859-1"?>
 <nfse>
 <nf>
@@ -58,12 +74,12 @@ export async function gerarNotaFiscalAction(imovelId: number, valor: string) {
     <observacao>IMOVEL: ${imovel.endereco}</observacao>
 </nf>
 <prestador>
-    <cpfcnpj>${login}</cpfcnpj>
+    <cpfcnpj>${loginLimpo}</cpfcnpj>
     <cidade>${cidadeCodigoTom}</cidade>
 </prestador>
 <tomador>
     <tipo>${tomador.type}</tipo>
-    <cpfcnpj>${tomador.cpf_cnpj}</cpfcnpj>
+    <cpfcnpj>${limparCpfCnpj(tomador.cpf_cnpj)}</cpfcnpj>
     <nome_razao_social>${escapeXml(
       tomador.nome_razao_social
     )}</nome_razao_social>
