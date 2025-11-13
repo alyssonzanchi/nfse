@@ -13,11 +13,11 @@ function escapeXml(unsafe: string | null | undefined): string {
   return unsafe.replace(/&/g, "&amp;");
 }
 
-function limparCpfCnpj(cpfCnpj: string | null | undefined): string {
-  if (!cpfCnpj) {
+function apenasNumeros(valor: string | null | undefined): string {
+  if (!valor) {
     return "";
   }
-  return cpfCnpj.replace(/\D/g, "");
+  return valor.replace(/\D/g, "");
 }
 
 export async function gerarNotaFiscalAction(imovelId: number, valor: string) {
@@ -58,7 +58,7 @@ export async function gerarNotaFiscalAction(imovelId: number, valor: string) {
       };
     }
 
-    const loginLimpo = limparCpfCnpj(login);
+    const loginLimpo = apenasNumeros(login);
 
     const data = `<?xml version="1.0" encoding="ISO-8859-1"?>
 <nfse>
@@ -79,7 +79,7 @@ export async function gerarNotaFiscalAction(imovelId: number, valor: string) {
 </prestador>
 <tomador>
     <tipo>${tomador.type}</tipo>
-    <cpfcnpj>${limparCpfCnpj(tomador.cpf_cnpj)}</cpfcnpj>
+    <cpfcnpj>${apenasNumeros(tomador.cpf_cnpj)}</cpfcnpj>
     <nome_razao_social>${escapeXml(
       tomador.nome_razao_social
     )}</nome_razao_social>
@@ -88,7 +88,7 @@ export async function gerarNotaFiscalAction(imovelId: number, valor: string) {
     <complemento>${tomador.complemento ?? ""}</complemento>
     <bairro>${tomador.bairro}</bairro>
     <cidade>${tomador.cod_cidade}</cidade>
-    <cep>${tomador.cep}</cep>
+    <cep>${apenasNumeros(tomador.cep)}</cep>
 </tomador>
 <itens>
     <lista>
